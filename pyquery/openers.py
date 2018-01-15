@@ -50,6 +50,7 @@ def _query(url, method, kwargs):
 def _requests(url, kwargs):
     encoding = kwargs.get('encoding')
     method = kwargs.get('method', 'get').lower()
+    timeout =  kwargs.get('timeout')
     meth = getattr(requests, str(method))
     if method == 'get':
         url, data = _query(url, method, kwargs)
@@ -57,7 +58,7 @@ def _requests(url, kwargs):
     for k in allowed_args:
         if k in kwargs:
             kw[k] = kwargs[k]
-    resp = meth(url=url, **kw)
+    resp = meth(url=url, timeout=timeout, **kw)
     if not (200 <= resp.status_code < 300):
         raise HTTPError(resp.url, resp.status_code,
                         resp.reason, resp.headers, None)
@@ -69,8 +70,9 @@ def _requests(url, kwargs):
 
 def _urllib(url, kwargs):
     method = kwargs.get('method')
+    timeout =  kwargs.get('timeout')
     url, data = _query(url, method, kwargs)
-    return urlopen(url, data)
+    return urlopen(url, data, timeout=timeout)
 
 
 def url_opener(url, kwargs):
